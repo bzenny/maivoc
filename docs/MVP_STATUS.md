@@ -13,7 +13,7 @@
 | Free cloud connectors OpenRouter, Groq, Gemini | Configured | **No real model replies**; keys not provided to CI | Blocking |
 | Optional Ollama/Qwen local model | Configured | Qwen image/model download and generation not verified | Blocking |
 | Mid-conversation switching and side-by-side comparison | Upstream capability | Not exercised with live models | Blocking |
-| Persistent chat history and search | Upstream capability | Not tested across restart | Blocking |
+| Persistent chat history and search | Search enabled | Real authenticated message-save/search verified before and after full Docker stop/start; user-facing history/search UI still needs validation | API search verified, UI pending |
 | API-key persistence and rotation | Upstream capability | Not tested with real credentials | Blocking |
 | File/image upload with RAG disabled | Partially available upstream | UX behavior undecided (#11) | Blocking for clear MVP UX |
 | Android/iOS phone installation | Brand manifest/assets configured | Clean and returning-client tests not performed (#3) | Blocking |
@@ -49,5 +49,5 @@ Do not put real model keys, cloud credentials, private chat content, database vo
 ## Review #5 — M5 scheduler regression hardening
 The original M5 test passed despite LibreChat's `[schedules] scheduler NOT started` error when `SCHEDULES_SINGLE_PROCESS` was removed. The new regression suite tests that real failure path, disallows unallowlisted API ERROR/FATAL lines, and tests MongoDB-backed login persistence after a full Compose stop/start. See `scripts/test_m5_log_guard_unit.py`, `scripts/test_m5_scheduler_regression.py`, and `.github/workflows/runtime-smoke.yml`. Mark these completed only after the latest GitHub Actions jobs pass.
 
-## Search and provider remediation (in progress)
+## Search and provider remediation (search API verified; live provider calls pending)
 New installs explicitly enable LibreChat full-text search with Meilisearch telemetry disabled and a unique master key. Runtime CI writes a real message through LibreChat and searches it before and after a cold restart. Gemini's new bootstrap default is `gemini-3.5-flash-lite` (officially documented free-tier model), with actual live account response tests pending. Existing installations are not overwritten by `git pull`; follow README instructions and preserve existing secrets.
