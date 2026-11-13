@@ -108,6 +108,25 @@ def validate_endpoint_order(token: str) -> None:
                   "Ollama · Local · Private"):
         check(label in dumped, f"endpoint trust label: {label}")
 
+def validate_free_model_catalog(token: str) -> None:
+    """Verify configured free-first model IDs in the real v0.8.8 model API.
+
+    This does not consume any provider API quota or prove a key is authorized.
+    """
+    code, models = json_response("/api/models", token=token)
+    check(code == 200 and isinstance(models, dict),
+          "authenticated LibreChat model catalog responds")
+    expected = {
+        "OpenRouter": "openrouter/free",
+        "Groq": "openai/gpt-oss-20b",
+        "google": "gemini-3.5-flash-lite",
+    }
+    for provider, model in expected.items():
+        configured = models.get(provider)
+        check(configured is not None and model in json.dumps(configured),
+              f"model catalog exposes configured free-first {provider} model {model}")
+
+
 def search_enabled(token: str) -> None:
     code, enabled = request("/api/search/enable", token=token)
     check(code == 200 and enabled.strip() == b"true",
@@ -318,6 +337,7 @@ def main() -> None:
     check(code == 200 and isinstance(signed_in, dict) and
           isinstance(signed_in.get("token"), str), "owner login succeeds")
     validate_endpoint_order(signed_in["token"])
+    validate_free_model_catalog(signed_in["token"])
     search_enabled(signed_in["token"])
     convo_id, search_marker = create_search_fixture(signed_in["token"])
     verify_message_search(signed_in["token"], conversation_id=convo_id,
