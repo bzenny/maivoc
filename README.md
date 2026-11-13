@@ -47,6 +47,8 @@ docker compose up -d
 Open **http://localhost:3080**. The setup binds its HTTP port to **127.0.0.1** only. The free-first picker is ordered by `ENDPOINTS=custom,google,agents,anthropic,openAI`, so custom free endpoints appear before optional paid providers and the old Assistants picker is hidden. `SCHEDULES_SINGLE_PROCESS=true` enables scheduled features in this single-container development setup. Register your first account, then set `ALLOW_REGISTRATION=false` in `upstream/LibreChat/.env` and recreate the API container (`docker compose up -d --force-recreate api`). Do not publish a login before doing this. Secrets are generated in a Git-ignored local runtime; back up the credential encryption key and IV separately.
 
 ### Free cloud connectors
+[Optional live free-provider streaming checks and in-app acceptance instructions](docs/FREE_PROVIDER_TESTING.md) are available. The script uses your own API keys from terminal environment variables, never from GitHub or chat; it tests each provider directly, and the Maivoc UI path must still be verified separately.
+
 
 On the model selector, enter your **own** credentials:
 
