@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="440" viewBox="0 0 1800 440" role="img" aria-labelledby="title desc">
+<title id="title">Maivoc horizontal reversed logo for dark backgrounds</title><desc id="desc">Maivoc connected M beside Maivoc wordmark on transparent background.</desc>
+<g transform="translate(0,1) scale(.78125)">
+<defs>
+    <linearGradient id="left" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5135F5"/><stop offset=".55" stop-color="#7443F9"/><stop offset="1" stop-color="#9D57EE"/></linearGradient>
+    <linearGradient id="right" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3954C4"/><stop offset=".46" stop-color="#39B7AE"/><stop offset=".9" stop-color="#64EABD"/></linearGradient>
+    <linearGradient id="under" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#164D86"/><stop offset=".45" stop-color="#2BA5A6"/><stop offset="1" stop-color="#70EAC5"/></linearGradient>
+    <linearGradient id="darkRibbon" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1D247B" stop-opacity=".1"/><stop offset="1" stop-color="#072C5A" stop-opacity=".8"/></linearGradient>
+  </defs>
+  <path d="M45 443 L94 115 Q100 66 148 89 L256 165 L256 313 Q160 370 45 443 Z" fill="url(#left)"/>
+  <path d="M256 165 L364 89 Q412 63 419 113 L467 442 Q371 434 294 403 Q235 379 253 335 Q264 305 337 279 L382 262 L256 236 Z" fill="url(#right)"/>
+  <path d="M256 165 L256 312 Q159 371 45 443 Q132 285 256 165Z" fill="url(#darkRibbon)" opacity=".65"/>
+  <path d="M382 262 Q295 302 263 335 Q234 366 295 402 Q369 437 467 442 L411 313Z" fill="url(#under)" opacity=".9"/>
+  <path d="M46 443 Q162 350 270 309 Q343 280 411 266 Q344 269 274 287 Q149 319 46 443 Z" fill="#FFFFFF" opacity=".98"/>
+  <path d="M122 282 Q252 189 388 281" fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="122" cy="282" r="23" fill="#FFFFFF"/><circle cx="258" cy="227" r="23" fill="#FFFFFF"/><circle cx="388" cy="281" r="23" fill="#FFFFFF"/>
+</g><g id="maivoc-outlined-wordmark" transform="translate(440 305) scale(.142578125 -.142578125)" fill="#FFFFFF">
+  <path transform="translate(0.0 0)" d="M135 0H438V703C438 815 430 1034 427 1215C480 1015 540 806 575 703L826 0H1083L1330 703C1365 809 1428 1026 1478 1227C1475 1039 1467 815 1467 703V0H1774V1490H1304L1066 806C1036 711 990 512 956 351C921 513 875 712 845 806L603 1490H135Z"/>
+  <path transform="translate(1837.9 0)" d="M440 -22C605 -22 713 51 767 155H777V0H1061V753C1061 1024 827 1132 587 1132C337 1132 157 1021 100 827L375 781C399 853 470 910 586 910C698 910 761 856 761 761V756C761 683 682 675 490 656C270 635 68 563 68 313C68 92 227 -22 440 -22ZM525 189C426 189 356 234 356 321C356 411 430 454 541 470C607 479 726 495 763 521V400C763 282 665 189 525 189Z"/>
+  <path transform="translate(2956.7 0)" d="M128 0H428V1118H128ZM278 1264C368 1264 443 1332 443 1418C443 1503 368 1572 278 1572C187 1572 113 1503 113 1418C113 1332 187 1264 278 1264Z"/>
+  <path transform="translate(3441.6 0)" d="M443 0H784L1197 1118H882L696 538C665 437 641 337 618 233C594 337 569 438 538 538L350 1118H31Z"/>
+  <path transform="translate(4599.5 0)" d="M628 -22C964 -22 1175 210 1175 554C1175 900 964 1132 628 1132C291 1132 81 900 81 554C81 210 291 -22 628 -22ZM628 214C468 214 387 360 387 555C387 753 468 896 628 896C788 896 870 752 870 555C870 360 788 214 628 214Z"/>
+  <path transform="translate(5785.3 0)" d="M628 -22C896 -22 1085 123 1127 358L848 409C824 288 747 214 631 214C471 214 387 355 387 555C387 757 471 896 631 896C747 896 821 824 846 708L1125 760C1083 990 893 1132 628 1132C291 1132 81 900 81 554C81 210 291 -22 628 -22Z"/>
+</g>
+</svg>
