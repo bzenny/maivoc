@@ -1,6 +1,6 @@
 # Maivoc — every model, one workspace
 
-**Status:** integration foundation proposed; not yet deployed or validated against running containers.
+**Status:** self-hosted MVP development baseline verified by live, disposable Docker runtime CI; **not released or publicly deployed**. Real provider replies, local Qwen, mobile installation, HTTPS and backups remain to be tested. See [MVP readiness](docs/MVP_STATUS.md).
 **Upstream:** [LibreChat](https://github.com/LibreChat-AI/LibreChat) v0.8.8 (MIT).
 **Strategy:** personal self-hosting first, managed multi-user service only after a separate security/tenant-isolation design.
 
