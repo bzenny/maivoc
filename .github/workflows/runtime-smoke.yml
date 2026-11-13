@@ -19,19 +19,20 @@ permissions:
   contents: read
 jobs:
   runtime-smoke:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
         with:
           python-version: "3.12"
       - name: Install static schema checker
         run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
-      - name: Validate own config and brand assets
+      - name: Validate own config, brand and log-guard unit tests
         run: |
           python scripts/validate.py
           python scripts/verify_brand_assets.py
+          python -m unittest discover -s scripts -p 'test_m5_log_guard_unit.py' -v
       - name: Bootstrap pinned LibreChat without keys
         run: bash scripts/bootstrap.sh
       - name: Start actual pinned services
@@ -58,6 +59,46 @@ jobs:
               print(service, markers, "log_available=", p.returncode == 0)
           PY
       - name: Destroy temporary data and services
+        if: always()
+        run: |
+          if [ -f upstream/LibreChat/docker-compose.yml ]; then
+            cd upstream/LibreChat
+            docker compose down -v --remove-orphans || true
+          fi
+  # Must stay independent of the passing smoke job: prove our own guard
+  # rejects a real running LibreChat whose scheduler setting is removed.
+  scheduler-negative:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-python@v7.1.0
+        with:
+          python-version: "3.12"
+      - name: Reproduce reported failure by deleting bootstrap setting
+        run: |
+          sed -i '/"SCHEDULES_SINGLE_PROCESS":"true"/d' scripts/bootstrap.sh
+          if grep -q 'SCHEDULES_SINGLE_PROCESS' scripts/bootstrap.sh; then
+            echo "Unexpected scheduler setting remains in test bootstrap"
+            exit 1
+          fi
+          bash scripts/bootstrap.sh
+          if grep -q '^SCHEDULES_SINGLE_PROCESS=' upstream/LibreChat/.env; then
+            echo "Negative test failed to remove scheduler setting"
+            exit 1
+          fi
+      - name: Start real scheduler-disabled LibreChat
+        run: |
+          cd upstream/LibreChat
+          docker compose up -d --pull missing
+      - name: Prove live scheduler failure makes check_logs fail
+        run: python -u scripts/test_m5_scheduler_regression.py
+      - name: Sanitized container status on failure
+        if: failure()
+        run: |
+          cd upstream/LibreChat
+          docker compose ps || true
+      - name: Destroy temporary services
         if: always()
         run: |
           if [ -f upstream/LibreChat/docker-compose.yml ]; then

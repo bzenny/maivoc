@@ -45,3 +45,6 @@
 ## Hard boundary
 
 Do not put real model keys, cloud credentials, private chat content, database volumes or encryption secrets in GitHub or CI logs. An API free tier is not the same as private inference. The project is a LibreChat-based independent application; preserve MIT notices and upstream credit.
+
+## Review #5 — M5 scheduler regression hardening
+The original M5 test passed despite LibreChat's `[schedules] scheduler NOT started` error when `SCHEDULES_SINGLE_PROCESS` was removed. The new regression suite tests that real failure path, disallows unallowlisted API ERROR/FATAL lines, and tests MongoDB-backed login persistence after a full Compose stop/start. See `scripts/test_m5_log_guard_unit.py`, `scripts/test_m5_scheduler_regression.py`, and `.github/workflows/runtime-smoke.yml`. Mark these completed only after the latest GitHub Actions jobs pass.

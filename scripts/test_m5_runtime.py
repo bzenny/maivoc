@@ -7,7 +7,6 @@ Runs only against http://127.0.0.1:3080 on an ephemeral CI runner.
 from __future__ import annotations
 
 import json
-import os
 import re
 import secrets
 import subprocess
@@ -120,18 +119,49 @@ def disable_registration() -> None:
     compose("up", "-d", "--no-deps", "--force-recreate", "api")
     ready()
 
+# These are actual failure signatures from LibreChat v0.8.8, not guesses
+# about what a scheduler error might say. Regressions are tested by a live
+# scheduler-disabled CI boot plus an isolated log parser test.
+STARTUP_FAILURE_PATTERNS = {
+    "scheduler not started": r"\[schedules\][^\n]*scheduler\s+NOT\s+started",
+    "scheduler permanently unavailable": r"PERMANENTLY\s+unavailable",
+    "initialization failed": r"Post-listen initialization failed",
+    "server failed to start": r"Failed to start server:",
+    "startup config error": r"Error in startup config",
+    "scheduler single-process error": r"SCHEDULES_SINGLE_PROCESS must",
+    "scheduling disabled": r"schedule.*disabled",
+}
+
+# No error-level startup lines are allowlisted initially. Add a *specific*
+# proven-benign message only with documentation and a regression fixture.
+ALLOWED_ERROR_LEVEL_LOGS: tuple[str, ...] = ()
+ERROR_LEVEL_RE = re.compile(
+    r"(?:^|[\s|])(?:ERROR|FATAL)(?=[:\s\]])",
+    flags=re.IGNORECASE,
+)
+
+
+def assert_clean_api_logs(logs: str) -> None:
+    """Fail closed on known scheduling/initialization failures and error logs.
+
+    Never reproduce raw log lines in errors: they may contain private data.
+    """
+    for label, pattern in STARTUP_FAILURE_PATTERNS.items():
+        if re.search(pattern, logs, flags=re.IGNORECASE):
+            raise AssertionError(f"API log contains forbidden startup condition: {label}")
+        print(f"PASS: no API startup failure: {label}")
+
+    for line in logs.splitlines():
+        if ERROR_LEVEL_RE.search(line) and not any(
+            re.search(allowed, line) for allowed in ALLOWED_ERROR_LEVEL_LOGS
+        ):
+            raise AssertionError("API log contains an unallowlisted ERROR/FATAL level line")
+    print("PASS: no unallowlisted API ERROR/FATAL level lines")
+
+
 def check_logs() -> None:
     logs = compose("logs", "--no-color", "api").stdout
-    bad_patterns = (
-        "Post-listen initialization failed",
-        "Failed to start server:",
-        "Error in startup config",
-        "SCHEDULES_SINGLE_PROCESS must",
-        "schedule.*disabled",
-    )
-    for pattern in bad_patterns:
-        check(not re.search(pattern, logs, flags=re.IGNORECASE),
-              f"no startup log failure matching {pattern!r}")
+    assert_clean_api_logs(logs)
 
 def main() -> None:
     check((UPSTREAM / "docker-compose.yml").is_file(), "pinned upstream checkout exists")
@@ -171,6 +201,20 @@ def main() -> None:
                                           {"email": email, "password": password})
     check(code == 200 and bool(signed_in_again.get("token")),
           "existing owner login still succeeds")
+    check_logs()
+
+    # A real cold restart of API + persistence services: the user record must
+    # survive, not merely remain in the same running MongoDB process.
+    compose("stop", "api", "meilisearch", "mongodb")
+    compose("start", "mongodb", "meilisearch", "api")
+    ready()
+    code, persisted = json_response("/api/auth/login", "POST",
+                                    {"email": email, "password": password})
+    check(code == 200 and isinstance(persisted, dict) and bool(persisted.get("token")),
+          "owner account survives complete service stop/start and can log in")
+    code, cfg = json_response("/api/config")
+    check(code == 200 and cfg.get("registrationEnabled") is False,
+          "registration lock persists after complete service restart")
     check_logs()
     print("M5 RUNTIME SMOKE TEST PASSED — no model-provider calls made.")
 
