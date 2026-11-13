@@ -1,0 +1,56 @@
+name: M5 — LibreChat runtime smoke test
+on:
+  pull_request:
+    paths:
+      - "config/**"
+      - "scripts/**"
+      - "assets/branding/**"
+      - ".github/workflows/runtime-smoke.yml"
+      - "docs/ACCEPTANCE.md"
+  push:
+    branches: [main]
+    paths:
+      - "config/**"
+      - "scripts/**"
+      - "assets/branding/**"
+      - ".github/workflows/runtime-smoke.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  runtime-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install static schema checker
+        run: python -m pip install --disable-pip-version-check PyYAML==6.0.3
+      - name: Validate own config and brand assets
+        run: |
+          python scripts/validate.py
+          python scripts/verify_brand_assets.py
+      - name: Bootstrap pinned LibreChat without keys
+        run: bash scripts/bootstrap.sh
+      - name: Start actual pinned services
+        run: |
+          cd upstream/LibreChat
+          docker compose config -q
+          docker compose up -d --pull missing
+      - name: Verify startup, assets, endpoint order, trust labels and auth
+        run: python scripts/test_m5_runtime.py
+      - name: Sanitized container status on failure
+        if: failure()
+        run: |
+          cd upstream/LibreChat
+          docker compose ps || true
+          echo "Inspect application logs locally; CI intentionally does not dump potentially sensitive logs."
+      - name: Destroy temporary data and services
+        if: always()
+        run: |
+          if [ -f upstream/LibreChat/docker-compose.yml ]; then
+            cd upstream/LibreChat
+            docker compose down -v --remove-orphans || true
+          fi
