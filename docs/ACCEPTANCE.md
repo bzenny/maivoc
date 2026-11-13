@@ -43,7 +43,7 @@ Static checks do not count as application or security testing; record dates and 
 - [PR #12](https://github.com/bzenny/maivoc/pull/12), merged `9b1cd05`: reversed white-wordmark lockup, SVG wordmark outlines, protected binary generation, media usage instructions.
 - [PR #13](https://github.com/bzenny/maivoc/pull/13), merged `0151488`: disposable pinned LibreChat Docker runtime, branding file identity, startup health, endpoint model picker ordering contract, sign-up/login, registration disabled, sanitized startup log assertions.
 - [Successful PR runtime CI](https://github.com/bzenny/maivoc/actions/runs/43350676814): passed real Docker startup and auth checks. A successful PR test is not proof of production deployment.
-- [Review log / external smoke test](../README.md): external manual review reported correct model order, app branding, owner signup/login and startup after the prior PRs; no live provider keys or mobile test.
+- External Review #4 (2026-11-13): independently reported correct model order, branded assets, owner sign-in and startup. This review is not stored in the repository; the linked GitHub runtime run above is the reproducible evidence.
 - All checked entries in **M4** and **M5** above have direct GitHub or runtime evidence. Untested entries remain unchecked.
 
 ### Release gate for v0.1.0
