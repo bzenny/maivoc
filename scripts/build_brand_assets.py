@@ -35,6 +35,7 @@ def tile(size: int, content_width: float = 0.85) -> Image.Image:
 
 save(render_svg(BRAND / 'maivoc-mark.svg', 1024, 1024), BRAND / 'maivoc-mark.png')
 save(render_svg(BRAND / 'maivoc-lockup.svg', 1800, 440), BRAND / 'maivoc-lockup.png')
+save(render_svg(BRAND / 'maivoc-lockup-reversed.svg', 1800, 440), BRAND / 'maivoc-lockup-reversed.png')
 for size in (16, 32):
     save(render_svg(BRAND / 'maivoc-mark.svg', size, size), PWA / f'favicon-{size}x{size}.png')
 save(tile(180), PWA / 'apple-touch-icon-180x180.png')
