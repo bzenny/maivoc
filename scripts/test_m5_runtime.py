@@ -140,26 +140,84 @@ def verify_message_search(token: str, *, conversation_id: str, marker: str) -> N
 
 
 def create_search_fixture(token: str) -> tuple[str, str]:
-    """Write through LibreChat's authenticated message API, never MongoDB directly."""
+    """Save a real user message through LibreChat's authenticated import route.
+
+    v0.8.8 intentionally rejects POST /api/messages/:conversationId if no
+    owned conversation exists. Importing a LibreChat-format chat is the
+    supported user-facing API for saving a conversation without AI API calls.
+    """
     import uuid
-    conversation_id = str(uuid.uuid4())
-    marker = "maivocsearch" + secrets.token_hex(10)
-    payload = {
-        "messageId": str(uuid.uuid4()),
-        "conversationId": conversation_id,
-        "text": "Unique test phrase " + marker + " for Maivoc search verification",
-        "sender": "User",
-        "isCreatedByUser": True,
+    from datetime import datetime, timezone
+
+    title_marker = "maivoctitle" + secrets.token_hex(9)
+    message_marker = "maivocsearch" + secrets.token_hex(10)
+    original_id = str(uuid.uuid4())
+    message_id = str(uuid.uuid4())
+    when = datetime.now(timezone.utc).isoformat()
+    data = {
+        "conversationId": original_id,
         "endpoint": "OpenRouter",
-        "model": "openrouter/free",
+        "title": "Imported Maivoc test chat " + title_marker,
+        "branches": False,
+        "recursive": False,
+        "messages": [{
+            "messageId": message_id,
+            "conversationId": original_id,
+            "createdAt": when,
+            "updatedAt": when,
+            "endpoint": "OpenRouter",
+            "error": False,
+            "isCreatedByUser": True,
+            "parentMessageId": None,
+            "sender": "user",
+            "text": "Indexable test content " + message_marker + " for Maivoc verification",
+            "unfinished": False,
+        }],
     }
-    code, result = json_response(
-        "/api/messages/" + conversation_id, "POST", payload, token
+    boundary = "----maivoc-ci-" + secrets.token_hex(12)
+    body = (
+        ("--" + boundary + "\r\n"
+         'Content-Disposition: form-data; name="file"; filename="maivoc-fixture.json"\r\n'
+         "Content-Type: application/json\r\n\r\n").encode("ascii")
+        + json.dumps(data).encode("utf-8")
+        + ("\r\n--" + boundary + "--\r\n").encode("ascii")
     )
-    check(code == 201 and isinstance(result, dict) and
-          result.get("conversationId") == conversation_id,
-          "authenticated LibreChat API persists a test conversation and message")
-    return conversation_id, marker
+    req = urllib.request.Request(
+        BASE + "/api/convos/import",
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": "Bearer " + token,
+            "Origin": BASE,
+            "Referer": BASE + "/",
+            "Accept": "application/json",
+            "Content-Type": "multipart/form-data; boundary=" + boundary,
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=35) as res:
+            code = res.status
+    except urllib.error.HTTPError as err:
+        code = err.code
+    check(code == 201,
+          f"authenticated LibreChat import persists a test chat (HTTP status {code})")
+
+    # LibreChat assigns a new UUID on import instead of preserving exported IDs.
+    # Retrieve only the ID by the unique title, then test content search with a
+    # DIFFERENT marker that occurs solely within the saved user message.
+    deadline = time.monotonic() + 60
+    while time.monotonic() < deadline:
+        code, result = json_response("/api/convos?limit=100", token=token)
+        check(code == 200 and isinstance(result, dict),
+              "authenticated conversation listing responds")
+        for convo in result.get("conversations", []):
+            if isinstance(convo, dict) and title_marker in convo.get("title", ""):
+                convo_id = convo.get("conversationId")
+                if convo_id:
+                    print("PASS: imported conversation is persisted and owned by test user")
+                    return convo_id, message_marker
+        time.sleep(2)
+    raise AssertionError("Imported chat not found in authenticated conversation listing")
 
 
 def disable_registration() -> None:
