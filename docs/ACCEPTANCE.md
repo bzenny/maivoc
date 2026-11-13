@@ -34,8 +34,8 @@ Static checks do not count as application or security testing; record dates and 
 - [x] Test account registers; login token and ordered `/api/endpoints` work
 - [x] Free-first provider names and trust labels match integration contract
 - [x] Registration off returns 403 while pre-existing account can login
-- [ ] Scheduler/initialization failure detection: real scheduler-disabled CI must fail the log guard (Review #5)
-- [ ] Full API, MongoDB and search-service stop/start retains owner authentication and registration lock
+- [x] Scheduler/initialization failure detection: real scheduler-disabled CI must fail the log guard (Review #5)
+- [x] Full API, MongoDB and search-service stop/start retains owner authentication and registration lock
 **Not covered by CI:** real provider responses, local Qwen pull, mid-thread switching, side-by-side compare, history search/persistence, phone installation, production hosting, backups and restore.
 
 
@@ -67,9 +67,9 @@ Static checks do not count as application or security testing; record dates and 
 - Actions run on `ubuntu-24.04` with Node-24-based `actions/checkout@v7.0.1` and `actions/setup-python@v7.1.0`.
 
 ## Search and free-provider integration (issue #16 / #7)
-- [ ] Fresh bootstrap sets `SEARCH=true`, `MEILI_NO_ANALYTICS=true`, and unique master key
-- [ ] Authenticated LibreChat API persists an actual message and Meilisearch-backed search returns it
-- [ ] Full MongoDB, Meilisearch, API stop/start retains indexed search results
+- [x] Fresh bootstrap sets `SEARCH=true`, `MEILI_NO_ANALYTICS=true`, and unique master key
+- [x] Authenticated LibreChat API persists an actual message and Meilisearch-backed search returns it
+- [x] Full MongoDB, Meilisearch, API stop/start retains indexed search results
 - [ ] New Gemini default `gemini-3.5-flash-lite` recognized by live LibreChat config (not just static YAML)
 - [ ] Live Gemini free-tier API key completes streaming response without paid account
 - [ ] Live OpenRouter free router and Groq free-tier model complete streaming response
