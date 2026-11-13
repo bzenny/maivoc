@@ -23,7 +23,7 @@
 Treat token values as intended UI palette; the logo SVG gradients use additional intermediate stops. Meet WCAG AA contrast for all functional text, particularly mint on white.
 
 ## Typography
-**Inter** for product UI and wordmark. Recommended headings: semibold/bold, body: regular/medium. Prefer an accessible readable fallback. The SVG lockup includes a DejaVu Sans fallback; PNG is the reproducible display asset.
+**Inter** for product UI. The lockup wordmark is now **outlined Inter Bold glyphs** (not live SVG text), so no installed fonts are needed to render either variant. The typography outlines are stored only for the six-letter Maivoc brand wordmark, not as a font file. Recommended product UI headings: semibold/bold; body: regular/medium.
 
 ## Mark construction
 - The `M` must retain both wings, three white circular nodes, connecting arc and open internal pathway.
@@ -33,7 +33,7 @@ Treat token values as intended UI palette; the logo SVG gradients use additional
 
 ## Variant guidance
 - Transparent `maivoc-mark.png` or SVG for editorial, hero, iconography and light/dark layouts.
-- Transparent `maivoc-lockup.png` or SVG for README, sponsorship, presentation titles.
+- Transparent `maivoc-lockup.png` or SVG (dark wordmark) **only on light backgrounds**. Transparent `maivoc-lockup-reversed.png` or `maivoc-lockup-reversed.svg` (white wordmark) **only on dark backgrounds**.
 - Dark square icons with centered mark for browser install, mobile and system menus.
 - Maskable icon adds extra padding so operating systems can crop safely.
 
@@ -43,6 +43,9 @@ Treat token values as intended UI palette; the logo SVG gradients use additional
 - Don't apply drop shadows or clipping that cut off nodes.
 - Don't put free cloud models in the **Local · Private** category.
 - Don't represent Maivoc as an official LibreChat product or imply endorsement.
+
+## Font provenance
+The outlined wordmark paths are based on the Inter Bold typeface (SIL Open Font License 1.1, https://rsms.me/inter/). No font file is distributed in Maivoc. Retain this provenance notice with the design assets.
 
 ## Attribution
 Maivoc visual artwork was created for this project, independently of LibreChat's upstream marks. The separate application engine is based on **LibreChat (MIT)**, and its source and required notices remain in `docs/UPSTREAM.md` and `third_party/LibreChat-LICENSE`. Brand/trademark rights are not established by this guide; obtain project-owner approval for unrelated commercial use.
