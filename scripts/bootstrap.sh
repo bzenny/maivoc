@@ -32,6 +32,8 @@ values={
     "ALLOW_REGISTRATION":"true", # ONLY for first local signup, disable immediately
     "ALLOW_SOCIAL_LOGIN":"false",
     "ALLOW_SOCIAL_REGISTRATION":"false",
+    "ENDPOINTS":"custom,google,agents,anthropic,openAI", # Free-first picker, hide Assistants
+    "SCHEDULES_SINGLE_PROCESS":"true", # Single-instance scheduler, avoid startup error
     "OPENAI_API_KEY":"user_provided",
     "ANTHROPIC_API_KEY":"user_provided",
     "GOOGLE_KEY":"user_provided",
