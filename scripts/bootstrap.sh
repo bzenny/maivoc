@@ -9,7 +9,8 @@ for cmd in git python3 docker; do
   command -v "$cmd" >/dev/null || { echo "Missing dependency: $cmd" >&2; exit 1; }
 done
 docker compose version >/dev/null || { echo "Docker Compose plugin is required" >&2; exit 1; }
-python3 "$ROOT/scripts/validate.py"
+# Static YAML checks run in CI; local bootstrap relies on docker compose config.
+# Optional: install PyYAML and run python3 scripts/validate.py locally.
 if [[ -e "$DEST" ]]; then
   echo "Refusing to overwrite existing runtime: $DEST" >&2
   exit 1
