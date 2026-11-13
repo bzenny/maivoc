@@ -26,3 +26,13 @@ Static checks do not count as application or security testing; record dates and 
 - [ ] Install on Android and iOS displays Maivoc name + correct connected-M icon (test clean install and existing SW cache)
 - [ ] Existing LibreChat instance receives updated compose overlay and restarts with no errors
 - [ ] Upstream attribution and brand/media documentation are visible
+
+## M5 actual runtime CI (against disposable real LibreChat)
+- [ ] GitHub Actions smoke job passes end-to-end on an Ubuntu runner
+- [ ] Real `/health`, `/readyz`, `/api/config` report ready / title Maivoc
+- [ ] Manifest, icons, favicon and SVG logo are byte-identical to Git-tracked assets
+- [ ] Test account registers; login token and ordered `/api/endpoints` work
+- [ ] Free-first provider names and trust labels match integration contract
+- [ ] Registration off returns 403 while pre-existing account can login
+- [ ] No known scheduler/initialization failure signature in startup logs
+- [ ] Next stage: real provider responses, Qwen pull, model switching/compare, search and mobile still untested by this CI
