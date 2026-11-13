@@ -29,4 +29,8 @@ assert "local-model" in compose["services"]["ollama"]["profiles"]
 assert "rag" in compose["services"]["rag_api"]["profiles"]
 assert "admin" in compose["services"]["admin-panel"]["profiles"]
 assert (root/"scripts/bootstrap.sh").is_file()
+# Ensure the bootstrap writes the two tested LibreChat runtime settings.
+bootstrap=(root/"scripts/bootstrap.sh").read_text()
+assert '"ENDPOINTS":"custom,google,agents,anthropic,openAI"' in bootstrap
+assert '"SCHEDULES_SINGLE_PROCESS":"true"' in bootstrap
 print("Static Maivoc config checks passed; Docker/API integration still unverified.")
