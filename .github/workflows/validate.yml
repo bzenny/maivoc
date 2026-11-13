@@ -21,3 +21,5 @@ jobs:
         run: python scripts/verify_brand_assets.py
       - name: Guard against known LibreChat scheduler failures
         run: python -m unittest discover -s scripts -p 'test_m5_log_guard_unit.py' -v
+      - name: Validate free-provider SSE parser and model IDs (no keys, no network)
+        run: python -m unittest discover -s scripts -p 'test_free_provider_contract.py' -v
