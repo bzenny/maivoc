@@ -1,7 +1,7 @@
 name: Generate Maivoc branded PNG assets
 on:
   push:
-    branches: [feat/m4-branding]
+    branches: ["feat/**", "fix/**"]
     paths:
       - "assets/branding/*.svg"
       - "assets/branding/pwa/manifest.webmanifest"
@@ -12,6 +12,8 @@ permissions:
   contents: write
 jobs:
   generate:
+    # GitHub write token is NEVER used on main, even on manual dispatch.
+    if: github.event_name != 'pull_request' && (startsWith(github.ref, 'refs/heads/feat/') || startsWith(github.ref, 'refs/heads/fix/'))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +32,12 @@ jobs:
       - name: Commit generated binaries to current feature branch
         shell: bash
         run: |
-          git add assets/branding/maivoc-mark.png assets/branding/maivoc-lockup.png assets/branding/pwa/*.png
+          case "${GITHUB_REF_NAME}" in
+            main|master) echo "Refusing binary commit on protected/default branch"; exit 1 ;;
+            feat/*|fix/*) ;;
+            *) echo "Only feature/fix branches may receive generated assets"; exit 1 ;;
+          esac
+          git add assets/branding/maivoc-mark.png assets/branding/maivoc-lockup.png assets/branding/maivoc-lockup-reversed.png assets/branding/pwa/*.png
           if git diff --cached --quiet; then
             echo "Brand assets unchanged."
             exit 0
