@@ -37,3 +37,6 @@ For cost safety, OpenRouter's initial model list is intentionally **free only** 
 - https://huggingface.co/docs/inference-providers/pricing
 - https://developers.cloudflare.com/workers-ai/platform/pricing/
 - https://ollama.com/library/qwen3
+
+## Config source of truth (Gemini)
+LibreChat v0.8.8 ignores a `google.models` block within `librechat.yaml` for this built-in endpoint. Set `GOOGLE_KEY=user_provided` and `GOOGLE_MODELS` in the generated runtime `.env` instead. The existing 2.5 model choices have **not** been changed in this cleanup; choosing an actively supported free-eligible replacement, then testing real responses, is tracked in [issue #7](https://github.com/bzenny/maivoc/issues/7).
