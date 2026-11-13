@@ -19,7 +19,7 @@ docker compose config -q
 docker compose up -d
 ```
 
-Open **http://localhost:3080**. The setup binds its HTTP port to **127.0.0.1** only. Register your first account, then set `ALLOW_REGISTRATION=false` in `upstream/LibreChat/.env` and recreate the API container (`docker compose up -d --force-recreate api`). Do not publish a login before doing this. Secrets are generated in a Git-ignored local runtime; back up the credential encryption key and IV separately.
+Open **http://localhost:3080**. The setup binds its HTTP port to **127.0.0.1** only. The free-first picker is ordered by `ENDPOINTS=custom,google,agents,anthropic,openAI`, so custom free endpoints appear before optional paid providers and the old Assistants picker is hidden. `SCHEDULES_SINGLE_PROCESS=true` enables scheduled features in this single-container development setup. Register your first account, then set `ALLOW_REGISTRATION=false` in `upstream/LibreChat/.env` and recreate the API container (`docker compose up -d --force-recreate api`). Do not publish a login before doing this. Secrets are generated in a Git-ignored local runtime; back up the credential encryption key and IV separately.
 
 ### Free cloud connectors
 
@@ -47,5 +47,7 @@ Then select **Ollama** → `qwen3:4b` in Maivoc. This uses local CPU/RAM; a GPU-
 ### Scope and limitations
 
 This first branch includes configuration, validation, and deployment safeguards—not a finished PWA, credential dashboard, SaaS, or verified end-to-end deployment. The tagged LibreChat Compose file includes floating development images: Maivoc pins the main API image and excludes optional development services by default. See `docs/ARCHITECTURE.md`, `docs/PROVIDERS.md`, `docs/ACCEPTANCE.md`, and `docs/UPSTREAM.md`.
+
+**Already bootstrapped?** `scripts/bootstrap.sh` deliberately refuses to overwrite an existing `upstream/LibreChat` folder. Add `ENDPOINTS=custom,google,agents,anthropic,openAI` and `SCHEDULES_SINGLE_PROCESS=true` to your existing `upstream/LibreChat/.env` manually, then recreate the API container with `docker compose up -d --force-recreate api`. These two values are generated automatically only on a **fresh** bootstrap.
 
 No credentials, chat content, or local runtime files belong in Git. Maivoc is independent of, and not endorsed by, the LibreChat project.
