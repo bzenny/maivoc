@@ -16,6 +16,21 @@ Brand files live in `assets/branding/`. The transparent PNG master and opaque mo
 
 **Provider trust:** `Local · Private` (Ollama on your hardware); `Free · Limits apply` (rate-limited cloud free tiers); `Paid · Billed to your key` (optional APIs). The custom endpoint labels are set in YAML; not all built-in provider picker subtitles can be changed through configuration. See the guide.
 
+## Automated runtime verification (M5)
+
+GitHub Actions runs `scripts/test_m5_runtime.py` against a **fresh, real pinned LibreChat image** (not only the Maivoc static config). It checks HTTP readiness, byte-for-byte PWA asset overlays, one-time signup/login, ordered provider names and trust labels, blocked registrations after disabling signup, owner re-login, and startup failure signatures. No cloud model calls are made or user keys required. Logs and credentials are not uploaded to CI artifacts.
+
+To run the same test on an empty disposable instance (this registers and locks its throwaway test account):
+
+```bash
+bash scripts/bootstrap.sh
+cd upstream/LibreChat && docker compose up -d
+cd ../..
+python3 scripts/test_m5_runtime.py
+```
+
+**Important:** Do not run this against your existing personal instance; it sets `ALLOW_REGISTRATION=false` and creates a test account. Runtime CI is not a replacement for provider replies, mobile installation tests, or recovery/backup testing.
+
 ## Run locally on Linux Mint
 
 Prerequisites: Git, Python 3, Docker Engine with the Compose **v2.24.4+** plugin, and a Docker-capable Linux user.
