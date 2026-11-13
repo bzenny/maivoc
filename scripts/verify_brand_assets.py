@@ -10,6 +10,7 @@ PWA = BRAND / 'pwa'
 expected = {
     BRAND / 'maivoc-mark.png': (1024, 1024, True),
     BRAND / 'maivoc-lockup.png': (1800, 440, True),
+    BRAND / 'maivoc-lockup-reversed.png': (1800, 440, True),
     PWA / 'favicon-16x16.png': (16, 16, True),
     PWA / 'favicon-32x32.png': (32, 32, True),
     PWA / 'apple-touch-icon-180x180.png': (180, 180, False),
