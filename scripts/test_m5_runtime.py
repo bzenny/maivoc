@@ -215,6 +215,23 @@ def create_search_fixture(token: str) -> tuple[str, str]:
                 convo_id = convo.get("conversationId")
                 if convo_id:
                     print("PASS: imported conversation is persisted and owned by test user")
+                    # Write a second message through the normal authenticated
+                    # message-save API, so Meili indexing follows production
+                    # message-write hooks rather than a bulk-import edge case.
+                    payload = {
+                        "conversationId": convo_id,
+                        "messageId": str(uuid.uuid4()),
+                        "text": "Indexable follow-up message " + message_marker,
+                        "sender": "user",
+                        "isCreatedByUser": True,
+                        "endpoint": "OpenRouter",
+                        "model": "openrouter/free",
+                    }
+                    write_code, saved = json_response(
+                        "/api/messages/" + convo_id, "POST", payload, token
+                    )
+                    check(write_code == 201 and isinstance(saved, dict),
+                          f"real message write to owned conversation succeeds (HTTP {write_code})")
                     return convo_id, message_marker
         time.sleep(2)
     raise AssertionError("Imported chat not found in authenticated conversation listing")
