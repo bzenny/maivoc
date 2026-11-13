@@ -1,0 +1,41 @@
+name: Generate Maivoc branded PNG assets
+on:
+  push:
+    branches: [feat/m4-branding]
+    paths:
+      - "assets/branding/*.svg"
+      - "assets/branding/pwa/manifest.webmanifest"
+      - "scripts/build_brand_assets.py"
+      - ".github/workflows/brand-assets.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned image render dependencies
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0 CairoSVG==2.8.2
+      - name: Render brand PNGs
+        run: python scripts/build_brand_assets.py
+      - name: Verify PNGs and manifest
+        run: python scripts/verify_brand_assets.py
+      - name: Commit generated binaries to current feature branch
+        shell: bash
+        run: |
+          git add assets/branding/maivoc-mark.png assets/branding/maivoc-lockup.png assets/branding/pwa/*.png
+          if git diff --cached --quiet; then
+            echo "Brand assets unchanged."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build(brand): render connected-M PNG and PWA icon assets"
+          git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -6,6 +6,16 @@
 
 Maivoc offers cloud and local AI models in one browser/PWA workspace. Start free-first: Ollama on your own hardware, OpenRouter's free router, Google Gemini's eligible free API tier, and Groq's limited free tier. Optional OpenAI and Anthropic use **separate API billing**, not personal ChatGPT/Claude subscriptions. All cloud providers require their own free account/API key, subject to regional availability and rate limits.
 
+## Maivoc identity (M4)
+
+The canonical icon is the **connected-M** (violet→mint M wings with three white connected nodes), not the portal/lock symbol. [Brand guide](docs/BRANDING.md) · [Media and install guide](docs/MEDIA_GUIDE.md).
+
+![Maivoc connected-M icon](assets/branding/maivoc-mark.svg)
+
+Brand files live in `assets/branding/`. The transparent PNG master and opaque mobile/PWA icons are generated from SVG and committed by GitHub Actions. This repo's Compose overlay mounts the Maivoc web manifest and branded images onto the pinned official LibreChat application. Test an actual phone installation before calling PWA readiness complete.
+
+**Provider trust:** `Local · Private` (Ollama on your hardware); `Free · Limits apply` (rate-limited cloud free tiers); `Paid · Billed to your key` (optional APIs). The custom endpoint labels are set in YAML; not all built-in provider picker subtitles can be changed through configuration. See the guide.
+
 ## Run locally on Linux Mint
 
 Prerequisites: Git, Python 3, Docker Engine with the Compose **v2.24.4+** plugin, and a Docker-capable Linux user.
