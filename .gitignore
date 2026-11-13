@@ -1,0 +1,14 @@
+# No runtime data, secrets, model weights or chat content in Git
+upstream/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.db
+backups/
+secrets/
+models/
+__pycache__/
+.DS_Store
