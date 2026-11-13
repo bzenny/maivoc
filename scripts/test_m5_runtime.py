@@ -87,17 +87,22 @@ def validate_endpoint_order(token: str) -> None:
     check(code == 200 and isinstance(data, dict), "authenticated endpoints API responds")
     # v0.8.8 returns an insertion-ordered object. Keep only known provider keys;
     # non-provider metadata is allowed but must never be mistaken for a model.
-    expected = ["OpenRouter", "Groq", "Ollama", "google", "agents", "anthropic", "openAI"]
+    expected = ["OpenRouter", "Groq", "ollama", "google", "agents", "anthropic", "openAI"]
     raw_names = list(data.keys())
-    print("Endpoint API top-level identifiers (provider names only):", raw_names)
-    if isinstance(data.get("endpoints"), (list, dict)):
-        container = data["endpoints"]
-        print("Endpoint API nested identifiers:", list(container.keys()) if isinstance(container, dict) else
-              [x.get("name", x.get("endpoint", "<unnamed>")) if isinstance(x, dict) else x for x in container])
-    ordered = [name for name in raw_names if name in expected]
+    # LibreChat v0.8.8's actual frontend mapEndpoints() sorts by each
+    # endpoint config's `order` value; raw JSON object key order is NOT UI order:
+    # client/src/utils/endpoints.ts (LibreChat-AI/LibreChat, tag v0.8.8).
+    def client_order(key: str) -> float:
+        entry = data.get(key) or {}
+        if not isinstance(entry, dict):
+            return 0
+        return entry.get("order") or 0
+
+    ordered = [name for name in sorted(raw_names, key=client_order) if name in expected]
+    print("Provider order computed from live endpoint order fields:", ordered)
     check(ordered == expected,
-          "API returns free-first provider order (OpenRouter → Groq → Ollama → Gemini → Agents → Anthropic → OpenAI)")
-    check("assistants" not in [x.lower() for x in raw_names],
+          "picker ordering contract matches v0.8.8 mapEndpoints() (free-first)")
+    check(not any(x.lower() == "assistants" for x in raw_names),
           "legacy Assistants endpoint hidden")
     dumped = json.dumps(data, ensure_ascii=False)
     for label in ("OpenRouter · Free · Limits apply", "Groq · Free · Limits apply",
