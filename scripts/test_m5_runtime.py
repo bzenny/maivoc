@@ -108,6 +108,154 @@ def validate_endpoint_order(token: str) -> None:
                   "Ollama · Local · Private"):
         check(label in dumped, f"endpoint trust label: {label}")
 
+def validate_free_model_catalog(token: str) -> None:
+    """Verify configured free-first model IDs in the real v0.8.8 model API.
+
+    This does not consume any provider API quota or prove a key is authorized.
+    """
+    code, models = json_response("/api/models", token=token)
+    check(code == 200 and isinstance(models, dict),
+          "authenticated LibreChat model catalog responds")
+    expected = {
+        "OpenRouter": "openrouter/free",
+        "Groq": "openai/gpt-oss-20b",
+        "google": "gemini-3.5-flash-lite",
+    }
+    for provider, model in expected.items():
+        configured = models.get(provider)
+        check(configured is not None and model in json.dumps(configured),
+              f"model catalog exposes configured free-first {provider} model {model}")
+
+
+def search_enabled(token: str) -> None:
+    code, enabled = request("/api/search/enable", token=token)
+    check(code == 200 and enabled.strip() == b"true",
+          "LibreChat search endpoint enabled, not merely Meilisearch healthy")
+
+
+def verify_message_search(token: str, *, conversation_id: str, marker: str) -> None:
+    """Poll the actual authenticated LibreChat message-search API after indexing.
+
+    This uses the same search path as the UI. It must return our *saved* content,
+    not merely a healthy Meilisearch container or a match in MongoDB.
+    """
+    from urllib.parse import quote
+    deadline = time.monotonic() + 100
+    while time.monotonic() < deadline:
+        code, result = json_response(
+            "/api/messages?search=" + quote(marker) + "&pageSize=25",
+            token=token,
+        )
+        check(code == 200 and isinstance(result, dict),
+              "authenticated message-search API responds")
+        messages = result.get("messages") or []
+        if any(m.get("conversationId") == conversation_id and
+               marker in json.dumps(m, ensure_ascii=False)
+               for m in messages if isinstance(m, dict)):
+            print("PASS: persisted message is returned by indexed full-text search")
+            return
+        time.sleep(3)
+    raise AssertionError("Saved message not found in Meilisearch-backed search within 100s")
+
+
+def create_search_fixture(token: str) -> tuple[str, str]:
+    """Save a real user message through LibreChat's authenticated import route.
+
+    v0.8.8 intentionally rejects POST /api/messages/:conversationId if no
+    owned conversation exists. Importing a LibreChat-format chat is the
+    supported user-facing API for saving a conversation without AI API calls.
+    """
+    import uuid
+    from datetime import datetime, timezone
+
+    title_marker = "maivoctitle" + secrets.token_hex(9)
+    message_marker = "maivocsearch" + secrets.token_hex(10)
+    original_id = str(uuid.uuid4())
+    message_id = str(uuid.uuid4())
+    when = datetime.now(timezone.utc).isoformat()
+    data = {
+        "conversationId": original_id,
+        "endpoint": "OpenRouter",
+        "title": "Imported Maivoc test chat " + title_marker,
+        "branches": False,
+        "recursive": False,
+        "messages": [{
+            "messageId": message_id,
+            "conversationId": original_id,
+            "createdAt": when,
+            "updatedAt": when,
+            "endpoint": "OpenRouter",
+            "error": False,
+            "isCreatedByUser": True,
+            "parentMessageId": None,
+            "sender": "user",
+            "text": "Indexable test content " + message_marker + " for Maivoc verification",
+            "unfinished": False,
+        }],
+    }
+    boundary = "----maivoc-ci-" + secrets.token_hex(12)
+    body = (
+        ("--" + boundary + "\r\n"
+         'Content-Disposition: form-data; name="file"; filename="maivoc-fixture.json"\r\n'
+         "Content-Type: application/json\r\n\r\n").encode("ascii")
+        + json.dumps(data).encode("utf-8")
+        + ("\r\n--" + boundary + "--\r\n").encode("ascii")
+    )
+    req = urllib.request.Request(
+        BASE + "/api/convos/import",
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": "Bearer " + token,
+            "Origin": BASE,
+            "Referer": BASE + "/",
+            "Accept": "application/json",
+            "Content-Type": "multipart/form-data; boundary=" + boundary,
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=35) as res:
+            code = res.status
+    except urllib.error.HTTPError as err:
+        code = err.code
+    check(code == 201,
+          f"authenticated LibreChat import persists a test chat (HTTP status {code})")
+
+    # LibreChat assigns a new UUID on import instead of preserving exported IDs.
+    # Retrieve only the ID by the unique title, then test content search with a
+    # DIFFERENT marker that occurs solely within the saved user message.
+    deadline = time.monotonic() + 60
+    while time.monotonic() < deadline:
+        code, result = json_response("/api/convos?limit=100", token=token)
+        check(code == 200 and isinstance(result, dict),
+              "authenticated conversation listing responds")
+        for convo in result.get("conversations", []):
+            if isinstance(convo, dict) and title_marker in convo.get("title", ""):
+                convo_id = convo.get("conversationId")
+                if convo_id:
+                    print("PASS: imported conversation is persisted and owned by test user")
+                    # Write a second message through the normal authenticated
+                    # message-save API, so Meili indexing follows production
+                    # message-write hooks rather than a bulk-import edge case.
+                    payload = {
+                        "conversationId": convo_id,
+                        "messageId": str(uuid.uuid4()),
+                        "text": "Indexable follow-up message " + message_marker,
+                        "sender": "user",
+                        "isCreatedByUser": True,
+                        "endpoint": "OpenRouter",
+                        "model": "openrouter/free",
+                    }
+                    write_code, saved = json_response(
+                        "/api/messages/" + convo_id, "POST", payload, token
+                    )
+                    check(write_code == 201 and isinstance(saved, dict),
+                          f"real message write to owned conversation succeeds (HTTP {write_code})")
+                    return convo_id, message_marker
+        time.sleep(2)
+    raise AssertionError("Imported chat not found in authenticated conversation listing")
+
+
 def disable_registration() -> None:
     dotenv = UPSTREAM / ".env"
     text = dotenv.read_text()
@@ -189,6 +337,11 @@ def main() -> None:
     check(code == 200 and isinstance(signed_in, dict) and
           isinstance(signed_in.get("token"), str), "owner login succeeds")
     validate_endpoint_order(signed_in["token"])
+    validate_free_model_catalog(signed_in["token"])
+    search_enabled(signed_in["token"])
+    convo_id, search_marker = create_search_fixture(signed_in["token"])
+    verify_message_search(signed_in["token"], conversation_id=convo_id,
+                          marker=search_marker)
 
     disable_registration()
     code, locked_config = json_response("/api/config")
@@ -215,6 +368,9 @@ def main() -> None:
     code, cfg = json_response("/api/config")
     check(code == 200 and cfg.get("registrationEnabled") is False,
           "registration lock persists after complete service restart")
+    search_enabled(persisted["token"])
+    verify_message_search(persisted["token"], conversation_id=convo_id,
+                          marker=search_marker)
     check_logs()
     print("M5 RUNTIME SMOKE TEST PASSED — no model-provider calls made.")
 

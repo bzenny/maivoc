@@ -34,8 +34,8 @@ Static checks do not count as application or security testing; record dates and 
 - [x] Test account registers; login token and ordered `/api/endpoints` work
 - [x] Free-first provider names and trust labels match integration contract
 - [x] Registration off returns 403 while pre-existing account can login
-- [ ] Scheduler/initialization failure detection: real scheduler-disabled CI must fail the log guard (Review #5)
-- [ ] Full API, MongoDB and search-service stop/start retains owner authentication and registration lock
+- [x] Scheduler/initialization failure detection: real scheduler-disabled CI must fail the log guard (Review #5)
+- [x] Full API, MongoDB and search-service stop/start retains owner authentication and registration lock
 **Not covered by CI:** real provider responses, local Qwen pull, mid-thread switching, side-by-side compare, history search/persistence, phone installation, production hosting, backups and restore.
 
 
@@ -65,3 +65,13 @@ Static checks do not count as application or security testing; record dates and 
 - CI must deliberately remove `SCHEDULES_SINGLE_PROCESS` during disposable bootstrap and prove `check_logs()` rejects that actually broken run.
 - CI must also cold-stop/restart API, MongoDB and Meilisearch, then verify account persistence, owner login and registration lock.
 - Actions run on `ubuntu-24.04` with Node-24-based `actions/checkout@v7.0.1` and `actions/setup-python@v7.1.0`.
+
+## Search and free-provider integration (issue #16 / #7)
+- [x] Fresh bootstrap sets `SEARCH=true`, `MEILI_NO_ANALYTICS=true`, and unique master key
+- [x] Authenticated LibreChat API persists an actual message and Meilisearch-backed search returns it
+- [x] Full MongoDB, Meilisearch, API stop/start retains indexed search results
+- [x] New Gemini default `gemini-3.5-flash-lite` recognized by live LibreChat config (not just static YAML)
+- [ ] Live Gemini free-tier API key completes streaming response without paid account
+- [ ] Live OpenRouter free router and Groq free-tier model complete streaming response
+
+**Verified M5 evidence:** [CI run 43372373885](https://github.com/bzenny/maivoc/actions/runs/43372373885) passed live model-catalog, search indexing, search after restart, registration lock, and scheduler-disabled negative regression. Live cloud model responses remain unchecked.

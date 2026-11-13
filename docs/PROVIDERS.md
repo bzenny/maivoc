@@ -6,7 +6,7 @@
 |---|---|---|---|---|---|
 | Ollama (Qwen) | Configured, opt-in local profile | None; internal placeholder | No per-call provider charges, local compute costs | `qwen3:4b` | No cloud submission if truly local |
 | OpenRouter | Configured | User API key | `openrouter/free` routes to free models, rate limited | `openrouter/free` | Third-party model providers see requests |
-| Google Gemini API | Built-in configured | User API key | Eligible models have a free tier | `gemini-2.5-flash-lite` / `gemini-2.5-flash` | Free-tier prompts/responses may be used to improve products |
+| Google Gemini API | Built-in configured | User API key | Eligible models have a free tier | `gemini-3.5-flash-lite` | Free-tier prompts/responses may be used to improve products |
 | GroqCloud | Configured | User API key | Limited developer free plan, model-dependent | `openai/gpt-oss-20b` | Usage ceilings and deprecations can change |
 | OpenAI | Optional | User API key | Do not assume free inference | User-selected | API billed separately from ChatGPT subscriptions |
 | Anthropic | Optional | User API key | Do not assume free inference | User-selected | API billed separately from Claude subscriptions |
@@ -39,4 +39,7 @@ For cost safety, OpenRouter's initial model list is intentionally **free only** 
 - https://ollama.com/library/qwen3
 
 ## Config source of truth (Gemini)
-LibreChat v0.8.8 ignores a `google.models` block within `librechat.yaml` for this built-in endpoint. Set `GOOGLE_KEY=user_provided` and `GOOGLE_MODELS` in the generated runtime `.env` instead. The existing 2.5 model choices have **not** been changed in this cleanup; choosing an actively supported free-eligible replacement, then testing real responses, is tracked in [issue #7](https://github.com/bzenny/maivoc/issues/7).
+LibreChat v0.8.8 ignores a `google.models` block within `librechat.yaml` for this built-in endpoint. Set `GOOGLE_KEY=user_provided` and `GOOGLE_MODELS` in the generated runtime `.env` instead. Maivoc now configures `gemini-3.5-flash-lite` for **new** local instances based on Google's published free-tier API pricing and the upstream v0.8.8 supported model list. Live response, streaming, account/region entitlement, and spend-safety remain to be tested with a user's own free-tier key ([issue #7](https://github.com/bzenny/maivoc/issues/7)). Existing installations retain the older `GOOGLE_MODELS` until manually updated. A free cloud tier can use inputs and outputs to improve products.
+
+## Search configuration
+The local bootstrap now overrides the upstream default `SEARCH=false` with `SEARCH=true`, sets `MEILI_NO_ANALYTICS=true`, and generates a unique `MEILI_MASTER_KEY`. Meilisearch runs only on the private Compose network. Actual message saving, search, and cold-restart re-query are tested in M5 CI. Existing installations must add `SEARCH=true` and verify their Meilisearch key matches; do **not** replace keys or erase search data to enable it.

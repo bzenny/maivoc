@@ -44,11 +44,13 @@ values={
     "OPENAI_API_KEY":"user_provided",
     "ANTHROPIC_API_KEY":"user_provided",
     "GOOGLE_KEY":"user_provided",
-    "GOOGLE_MODELS":"gemini-2.5-flash-lite,gemini-2.5-flash",
+    "GOOGLE_MODELS":"gemini-3.5-flash-lite", # Current documented free-tier model; account/region eligibility applies
     "CREDS_KEY":secrets.token_hex(32),
     "CREDS_IV":secrets.token_hex(16),
     "JWT_SECRET":secrets.token_hex(32),
     "JWT_REFRESH_SECRET":secrets.token_hex(32),
+    "SEARCH":"true", # enable message/conversation search; upstream default is false
+    "MEILI_NO_ANALYTICS":"true", # disable Meilisearch telemetry
     "MEILI_MASTER_KEY":secrets.token_hex(32),
     "ADMIN_PANEL_SESSION_SECRET":secrets.token_hex(32),
     "UID":sys.argv[2],
