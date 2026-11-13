@@ -65,3 +65,11 @@ Static checks do not count as application or security testing; record dates and 
 - CI must deliberately remove `SCHEDULES_SINGLE_PROCESS` during disposable bootstrap and prove `check_logs()` rejects that actually broken run.
 - CI must also cold-stop/restart API, MongoDB and Meilisearch, then verify account persistence, owner login and registration lock.
 - Actions run on `ubuntu-24.04` with Node-24-based `actions/checkout@v7.0.1` and `actions/setup-python@v7.1.0`.
+
+## Search and free-provider integration (issue #16 / #7)
+- [ ] Fresh bootstrap sets `SEARCH=true`, `MEILI_NO_ANALYTICS=true`, and unique master key
+- [ ] Authenticated LibreChat API persists an actual message and Meilisearch-backed search returns it
+- [ ] Full MongoDB, Meilisearch, API stop/start retains indexed search results
+- [ ] New Gemini default `gemini-3.5-flash-lite` recognized by live LibreChat config (not just static YAML)
+- [ ] Live Gemini free-tier API key completes streaming response without paid account
+- [ ] Live OpenRouter free router and Groq free-tier model complete streaming response

@@ -108,6 +108,60 @@ def validate_endpoint_order(token: str) -> None:
                   "Ollama · Local · Private"):
         check(label in dumped, f"endpoint trust label: {label}")
 
+def search_enabled(token: str) -> None:
+    code, enabled = request("/api/search/enable", token=token)
+    check(code == 200 and enabled.strip() == b"true",
+          "LibreChat search endpoint enabled, not merely Meilisearch healthy")
+
+
+def verify_message_search(token: str, *, conversation_id: str, marker: str) -> None:
+    """Poll the actual authenticated LibreChat message-search API after indexing.
+
+    This uses the same search path as the UI. It must return our *saved* content,
+    not merely a healthy Meilisearch container or a match in MongoDB.
+    """
+    from urllib.parse import quote
+    deadline = time.monotonic() + 100
+    while time.monotonic() < deadline:
+        code, result = json_response(
+            "/api/messages?search=" + quote(marker) + "&pageSize=25",
+            token=token,
+        )
+        check(code == 200 and isinstance(result, dict),
+              "authenticated message-search API responds")
+        messages = result.get("messages") or []
+        if any(m.get("conversationId") == conversation_id and
+               marker in json.dumps(m, ensure_ascii=False)
+               for m in messages if isinstance(m, dict)):
+            print("PASS: persisted message is returned by indexed full-text search")
+            return
+        time.sleep(3)
+    raise AssertionError("Saved message not found in Meilisearch-backed search within 100s")
+
+
+def create_search_fixture(token: str) -> tuple[str, str]:
+    """Write through LibreChat's authenticated message API, never MongoDB directly."""
+    import uuid
+    conversation_id = str(uuid.uuid4())
+    marker = "maivocsearch" + secrets.token_hex(10)
+    payload = {
+        "messageId": str(uuid.uuid4()),
+        "conversationId": conversation_id,
+        "text": "Unique test phrase " + marker + " for Maivoc search verification",
+        "sender": "User",
+        "isCreatedByUser": True,
+        "endpoint": "OpenRouter",
+        "model": "openrouter/free",
+    }
+    code, result = json_response(
+        "/api/messages/" + conversation_id, "POST", payload, token
+    )
+    check(code == 201 and isinstance(result, dict) and
+          result.get("conversationId") == conversation_id,
+          "authenticated LibreChat API persists a test conversation and message")
+    return conversation_id, marker
+
+
 def disable_registration() -> None:
     dotenv = UPSTREAM / ".env"
     text = dotenv.read_text()
@@ -189,6 +243,10 @@ def main() -> None:
     check(code == 200 and isinstance(signed_in, dict) and
           isinstance(signed_in.get("token"), str), "owner login succeeds")
     validate_endpoint_order(signed_in["token"])
+    search_enabled(signed_in["token"])
+    convo_id, search_marker = create_search_fixture(signed_in["token"])
+    verify_message_search(signed_in["token"], conversation_id=convo_id,
+                          marker=search_marker)
 
     disable_registration()
     code, locked_config = json_response("/api/config")
@@ -215,6 +273,9 @@ def main() -> None:
     code, cfg = json_response("/api/config")
     check(code == 200 and cfg.get("registrationEnabled") is False,
           "registration lock persists after complete service restart")
+    search_enabled(persisted["token"])
+    verify_message_search(persisted["token"], conversation_id=convo_id,
+                          marker=search_marker)
     check_logs()
     print("M5 RUNTIME SMOKE TEST PASSED — no model-provider calls made.")
 

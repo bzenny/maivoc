@@ -18,7 +18,7 @@ Brand files live in `assets/branding/`. Use the [light lockup](assets/branding/m
 
 ## Automated runtime verification (M5)
 
-GitHub Actions runs `scripts/test_m5_runtime.py` against a **fresh, real pinned LibreChat image** (not only the Maivoc static config). It checks HTTP readiness, byte-for-byte PWA asset overlays, one-time signup/login, ordered provider names and trust labels, blocked registrations after disabling signup, owner re-login, and startup failure signatures. It also intentionally boots a scheduler-disabled instance to prove the log guard rejects `[schedules] scheduler NOT started` / `PERMANENTLY unavailable`, and verifies owner login survives a full database/application stop-start. No cloud model calls are made or user keys required. Logs and credentials are not uploaded to CI artifacts.
+GitHub Actions runs `scripts/test_m5_runtime.py` against a **fresh, real pinned LibreChat image** (not only the Maivoc static config). It checks actual persisted-message search and search after a cold restart, HTTP readiness, byte-for-byte PWA asset overlays, one-time signup/login, ordered provider names and trust labels, blocked registrations after disabling signup, owner re-login, and startup failure signatures. It also intentionally boots a scheduler-disabled instance to prove the log guard rejects `[schedules] scheduler NOT started` / `PERMANENTLY unavailable`, and verifies owner login survives a full database/application stop-start. No cloud model calls are made or user keys required. Logs and credentials are not uploaded to CI artifacts.
 
 To run the same test on an empty disposable instance (this registers and locks its throwaway test account):
 
@@ -51,7 +51,7 @@ Open **http://localhost:3080**. The setup binds its HTTP port to **127.0.0.1** o
 On the model selector, enter your **own** credentials:
 
 - **OpenRouter** — select `openrouter/free` to avoid selecting a paid model by accident. [Create key](https://openrouter.ai/settings/keys).
-- **Google Gemini** — select `gemini-2.5-flash-lite` or `gemini-2.5-flash` if currently free/available to your account. [Create key](https://aistudio.google.com/apikey).
+- **Google Gemini** — select `gemini-3.5-flash-lite` if currently free/available to your account. [Create key](https://aistudio.google.com/apikey).
 - **Groq** — select `openai/gpt-oss-20b`. [Create key](https://console.groq.com/keys).
 - **OpenAI/Anthropic (optional)** — bring paid API credentials only if desired.
 
@@ -73,6 +73,8 @@ Then select **Ollama** → `qwen3:4b` in Maivoc. This uses local CPU/RAM; a GPU-
 
 This first branch includes configuration, validation, and deployment safeguards—not a finished PWA, credential dashboard, SaaS, or verified end-to-end deployment. The tagged LibreChat Compose file includes floating development images: Maivoc pins the main API image and excludes optional development services by default. See `docs/ARCHITECTURE.md`, `docs/PROVIDERS.md`, `docs/ACCEPTANCE.md`, and `docs/UPSTREAM.md`.
 
-**Already bootstrapped?** `scripts/bootstrap.sh` deliberately refuses to overwrite an existing `upstream/LibreChat` folder. Add `ENDPOINTS=custom,google,agents,anthropic,openAI` and `SCHEDULES_SINGLE_PROCESS=true` to your existing `upstream/LibreChat/.env` manually, then recreate the API container with `docker compose up -d --force-recreate api`. These two values are generated automatically only on a **fresh** bootstrap.
+**Search (enabled on fresh installs):** The bootstrap generates `SEARCH=true`, `MEILI_NO_ANALYTICS=true`, and a persistent `MEILI_MASTER_KEY`. Existing installs must explicitly add `SEARCH=true` in their existing `.env` and restart the API container without changing encryption or search keys. Existing chats may require time for index synchronization. Never expose Meilisearch port 7700 publicly. See [LibreChat's Meilisearch documentation](https://www.librechat.ai/docs/configuration/meilisearch).
+
+**Already bootstrapped?** `scripts/bootstrap.sh` deliberately refuses to overwrite an existing `upstream/LibreChat` folder. Add `ENDPOINTS=custom,google,agents,anthropic,openAI` and `SCHEDULES_SINGLE_PROCESS=true` to your existing `upstream/LibreChat/.env` manually, then recreate the API container with `docker compose up -d --force-recreate api`. These settings, search, and the current Gemini model are generated automatically only on a **fresh** bootstrap. For upgrades, preserve your current secrets and carefully update `SEARCH=true`, `MEILI_NO_ANALYTICS=true`, and (after checking free-tier eligibility) `GOOGLE_MODELS=gemini-3.5-flash-lite`.
 
 No credentials, chat content, or local runtime files belong in Git. Maivoc is independent of, and not endorsed by, the LibreChat project.

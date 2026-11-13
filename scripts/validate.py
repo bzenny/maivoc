@@ -34,6 +34,9 @@ assert (root/"scripts/bootstrap.sh").is_file()
 bootstrap=(root/"scripts/bootstrap.sh").read_text()
 assert '"ENDPOINTS":"custom,google,agents,anthropic,openAI"' in bootstrap
 assert '"SCHEDULES_SINGLE_PROCESS":"true"' in bootstrap
+assert '"SEARCH":"true"' in bootstrap
+assert '"MEILI_NO_ANALYTICS":"true"' in bootstrap
+assert '"GOOGLE_MODELS":"gemini-3.5-flash-lite"' in bootstrap
 # M4 manifest, SVG sources, Compose overlay, trust labels.
 import json
 manifest=json.loads((root/"assets/branding/pwa/manifest.webmanifest").read_text())
