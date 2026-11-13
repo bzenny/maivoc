@@ -15,6 +15,7 @@ ComposeLoader.add_constructor("!override", lambda loader,node: loader.construct_
 config=yaml.safe_load((root/"config/librechat.yaml").read_text())
 compose=yaml.load((root/"config/docker-compose.override.yml").read_text(), Loader=ComposeLoader)
 assert config["version"]=="1.3.17"
+assert "google" not in config["endpoints"], "Google built-in models are controlled through runtime .env, not YAML"
 custom={item["name"]:item for item in config["endpoints"]["custom"]}
 assert {"OpenRouter","Groq","Ollama"} <= set(custom)
 assert custom["OpenRouter"]["models"]["default"]==["openrouter/free"]
