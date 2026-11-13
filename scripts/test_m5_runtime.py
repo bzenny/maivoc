@@ -89,6 +89,11 @@ def validate_endpoint_order(token: str) -> None:
     # non-provider metadata is allowed but must never be mistaken for a model.
     expected = ["OpenRouter", "Groq", "Ollama", "google", "agents", "anthropic", "openAI"]
     raw_names = list(data.keys())
+    print("Endpoint API top-level identifiers (provider names only):", raw_names)
+    if isinstance(data.get("endpoints"), (list, dict)):
+        container = data["endpoints"]
+        print("Endpoint API nested identifiers:", list(container.keys()) if isinstance(container, dict) else
+              [x.get("name", x.get("endpoint", "<unnamed>")) if isinstance(x, dict) else x for x in container])
     ordered = [name for name in raw_names if name in expected]
     check(ordered == expected,
           "API returns free-first provider order (OpenRouter → Groq → Ollama → Gemini → Agents → Anthropic → OpenAI)")
