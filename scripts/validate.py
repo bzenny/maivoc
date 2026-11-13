@@ -33,4 +33,19 @@ assert (root/"scripts/bootstrap.sh").is_file()
 bootstrap=(root/"scripts/bootstrap.sh").read_text()
 assert '"ENDPOINTS":"custom,google,agents,anthropic,openAI"' in bootstrap
 assert '"SCHEDULES_SINGLE_PROCESS":"true"' in bootstrap
-print("Static Maivoc config checks passed; Docker/API integration still unverified.")
+# M4 manifest, SVG sources, Compose overlay, trust labels.
+import json
+manifest=json.loads((root/"assets/branding/pwa/manifest.webmanifest").read_text())
+assert manifest["short_name"]=="Maivoc" and manifest["display"]=="standalone"
+assert manifest["theme_color"]=="#0B0F17"
+assert len(manifest["icons"])>=3
+assert (root/"assets/branding/maivoc-mark.svg").is_file()
+assert (root/"assets/branding/maivoc-lockup.svg").is_file()
+api=compose["services"]["api"]
+mounts=[v["target"] for v in api["volumes"] if isinstance(v,dict)]
+assert "/app/client/dist/manifest.webmanifest" in mounts
+assert "/app/client/dist/assets/maskable-icon.png" in mounts
+assert custom["Ollama"]["modelDisplayLabel"].endswith("Local · Private")
+assert "Free · Limits apply" in custom["OpenRouter"]["modelDisplayLabel"]
+assert "Free · Limits apply" in custom["Groq"]["modelDisplayLabel"]
+print("Static Maivoc config and branding checks passed; Docker/mobile integration still unverified.")

@@ -14,3 +14,6 @@ Maivoc is an independent community configuration/experience layer, **not** an of
 
 ## Rule for every future copied repo or asset
 Record original author, source URL, license, commit/tag, files reused, modifications, notice location, and attribution destination. Retain required copyright/license text in distributed copies, verify transitive assets independently, and give upstream authors appropriate credit. Maivoc-authored code licensing remains undecided; LibreChat's MIT license does not automatically assign Maivoc's own license.
+
+## Maivoc brand graphics (M4)
+The connected-M mark, transparent PNG and icon variants are original Maivoc project artwork, not a copied LibreChat upstream logo. SVG masters and the deterministic PNG render script live under `assets/branding/` and `scripts/build_brand_assets.py`. See `docs/BRANDING.md` and `docs/MEDIA_GUIDE.md` for correct usage. LibreChat's MIT notice remains unchanged and present.

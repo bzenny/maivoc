@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+<title id="title">Maivoc connected M</title><desc id="desc">Violet and mint abstract M with three connected nodes and an open pathway. Transparent background.</desc>
+<defs>
+    <linearGradient id="left" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5135F5"/><stop offset=".55" stop-color="#7443F9"/><stop offset="1" stop-color="#9D57EE"/></linearGradient>
+    <linearGradient id="right" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3954C4"/><stop offset=".46" stop-color="#39B7AE"/><stop offset=".9" stop-color="#64EABD"/></linearGradient>
+    <linearGradient id="under" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#164D86"/><stop offset=".45" stop-color="#2BA5A6"/><stop offset="1" stop-color="#70EAC5"/></linearGradient>
+    <linearGradient id="darkRibbon" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1D247B" stop-opacity=".1"/><stop offset="1" stop-color="#072C5A" stop-opacity=".8"/></linearGradient>
+  </defs>
+  <path d="M45 443 L94 115 Q100 66 148 89 L256 165 L256 313 Q160 370 45 443 Z" fill="url(#left)"/>
+  <path d="M256 165 L364 89 Q412 63 419 113 L467 442 Q371 434 294 403 Q235 379 253 335 Q264 305 337 279 L382 262 L256 236 Z" fill="url(#right)"/>
+  <path d="M256 165 L256 312 Q159 371 45 443 Q132 285 256 165Z" fill="url(#darkRibbon)" opacity=".65"/>
+  <path d="M382 262 Q295 302 263 335 Q234 366 295 402 Q369 437 467 442 L411 313Z" fill="url(#under)" opacity=".9"/>
+  <path d="M46 443 Q162 350 270 309 Q343 280 411 266 Q344 269 274 287 Q149 319 46 443 Z" fill="#FFFFFF" opacity=".98"/>
+  <path d="M122 282 Q252 189 388 281" fill="none" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="122" cy="282" r="23" fill="#FFFFFF"/><circle cx="258" cy="227" r="23" fill="#FFFFFF"/><circle cx="388" cy="281" r="23" fill="#FFFFFF"/>
+</svg>

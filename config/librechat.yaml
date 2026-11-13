@@ -20,7 +20,7 @@ endpoints:
       dropParams: ["stop"]
       titleConvo: true
       titleModel: "current_model"
-      modelDisplayLabel: "OpenRouter — Free"
+      modelDisplayLabel: "OpenRouter · Free · Limits apply"
 
     - name: "Groq"
       apiKey: "user_provided"
@@ -30,7 +30,7 @@ endpoints:
         fetch: false
       titleConvo: true
       titleModel: "current_model"
-      modelDisplayLabel: "Groq — Free Tier"
+      modelDisplayLabel: "Groq · Free · Limits apply"
 
     # Ollama is opt-in with: docker compose --profile local-model up -d ollama
     # No Ollama port is published externally.
@@ -42,4 +42,4 @@ endpoints:
         fetch: true
       titleConvo: true
       titleModel: "current_model"
-      modelDisplayLabel: "Ollama — Local"
+      modelDisplayLabel: "Ollama · Local · Private"

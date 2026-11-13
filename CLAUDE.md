@@ -18,3 +18,6 @@ Mission: ship a simple, personal-first, free-first AI workspace based on LibreCh
 Read docs and code → smallest change → lint `python3 scripts/validate.py` → `bash -n scripts/bootstrap.sh` → inspect diff → test actual Compose where available → review → commit.
 
 Initial UX target: Connect → Converse → Switch → Compare → Search. No unnecessary features or speculative framework rewrites.
+
+## Brand rule — M4
+Always use the **connected-M** mark and official asset masters in `assets/branding/`; never substitute the portal/lock illustration. Read `docs/BRANDING.md` and `docs/MEDIA_GUIDE.md`. The official LibreChat PWA uses a built-in service-worker cache; validate stale install updates before declaring mobile acceptance. Keep three trust categories precise and never imply cloud free tiers are private.

@@ -12,6 +12,40 @@ services:
         source: ./librechat.yaml
         target: /app/librechat.yaml
         read_only: true
+      # Maivoc PWA manifest and icons replace official LibreChat build assets (no fork).
+      # Override file is copied to upstream/LibreChat; ../../ resolves to Maivoc repo root.
+      - type: bind
+        source: ../../assets/branding/pwa/manifest.webmanifest
+        target: /app/client/dist/manifest.webmanifest
+        read_only: true
+      - type: bind
+        source: ../../assets/branding/pwa/favicon-16x16.png
+        target: /app/client/dist/assets/favicon-16x16.png
+        read_only: true
+      - type: bind
+        source: ../../assets/branding/pwa/favicon-32x32.png
+        target: /app/client/dist/assets/favicon-32x32.png
+        read_only: true
+      - type: bind
+        source: ../../assets/branding/pwa/apple-touch-icon-180x180.png
+        target: /app/client/dist/assets/apple-touch-icon-180x180.png
+        read_only: true
+      - type: bind
+        source: ../../assets/branding/pwa/icon-192x192.png
+        target: /app/client/dist/assets/icon-192x192.png
+        read_only: true
+      - type: bind
+        source: ../../assets/branding/pwa/maskable-icon.png
+        target: /app/client/dist/assets/maskable-icon.png
+        read_only: true
+      - type: bind
+        source: ../../assets/branding/pwa/icon-512x512.png
+        target: /app/client/dist/assets/icon-512x512.png
+        read_only: true
+      - type: bind
+        source: ../../assets/branding/maivoc-mark.svg
+        target: /app/client/dist/assets/logo.svg
+        read_only: true
 
   # Admin panel and RAG/vector services are not needed for the chat MVP.
   admin-panel:
