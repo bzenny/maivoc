@@ -12,7 +12,7 @@ import time
 from test_m5_runtime import ready, compose, check_logs
 
 OBSERVED_FAILURE = re.compile(
-    r"\\[schedules\\][^\\n]*scheduler\\s+NOT\\s+started|PERMANENTLY\\s+unavailable",
+    r"\[schedules\][^\n]*scheduler\s+NOT\s+started|PERMANENTLY\s+unavailable",
     re.IGNORECASE,
 )
 
