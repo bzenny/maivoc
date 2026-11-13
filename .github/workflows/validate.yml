@@ -17,3 +17,5 @@ jobs:
         run: bash -n scripts/bootstrap.sh
       - name: Validate config invariants
         run: python scripts/validate.py
+      - name: Validate checked-in brand PNGs and PWA manifest
+        run: python scripts/verify_brand_assets.py
