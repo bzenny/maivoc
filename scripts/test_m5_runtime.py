@@ -63,7 +63,7 @@ def ready(timeout_sec: int = 210) -> None:
         except (OSError, TimeoutError):
             pass
         time.sleep(3)
-    raise AssertionError("LibreChat /readyz did not reach 200 within timeout")
+    raise AssertionError("LibreChat /readyz did not reach 200 within timeout; inspect sanitized container status")
 
 def validate_assets() -> None:
     expected = {
