@@ -70,6 +70,8 @@ Static checks do not count as application or security testing; record dates and 
 - [x] Fresh bootstrap sets `SEARCH=true`, `MEILI_NO_ANALYTICS=true`, and unique master key
 - [x] Authenticated LibreChat API persists an actual message and Meilisearch-backed search returns it
 - [x] Full MongoDB, Meilisearch, API stop/start retains indexed search results
-- [ ] New Gemini default `gemini-3.5-flash-lite` recognized by live LibreChat config (not just static YAML)
+- [x] New Gemini default `gemini-3.5-flash-lite` recognized by live LibreChat config (not just static YAML)
 - [ ] Live Gemini free-tier API key completes streaming response without paid account
 - [ ] Live OpenRouter free router and Groq free-tier model complete streaming response
+
+**Verified M5 evidence:** [CI run 43372373885](https://github.com/bzenny/maivoc/actions/runs/43372373885) passed live model-catalog, search indexing, search after restart, registration lock, and scheduler-disabled negative regression. Live cloud model responses remain unchecked.
