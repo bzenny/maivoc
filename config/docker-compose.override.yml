@@ -1,0 +1,35 @@
+# Local-first safety overlay for LibreChat v0.8.8.
+# Requires Docker Compose v2.24.4+ for !override tags.
+services:
+  api:
+    image: ghcr.io/librechat-ai/librechat:v0.8.8
+    ports: !override
+      - "127.0.0.1:${PORT:-3080}:${PORT:-3080}"
+    depends_on: !override
+      - mongodb
+    volumes:
+      - type: bind
+        source: ./librechat.yaml
+        target: /app/librechat.yaml
+        read_only: true
+
+  # Admin panel and RAG/vector services are not needed for the chat MVP.
+  admin-panel:
+    profiles: ["admin"]
+    ports: !override
+      - "127.0.0.1:${ADMIN_PANEL_PORT:-3000}:3000"
+  rag_api:
+    profiles: ["rag"]
+  vectordb:
+    profiles: ["rag"]
+
+  # Optional local inference: Docker-only network access, no published ports.
+  ollama:
+    image: ollama/ollama:0.40.16
+    profiles: ["local-model"]
+    restart: unless-stopped
+    volumes:
+      - ollama-models:/root/.ollama
+
+volumes:
+  ollama-models:
