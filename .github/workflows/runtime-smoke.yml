@@ -40,13 +40,23 @@ jobs:
           docker compose config -q
           docker compose up -d --pull missing
       - name: Verify startup, assets, endpoint order, trust labels and auth
-        run: python scripts/test_m5_runtime.py
-      - name: Sanitized container status on failure
+        run: python -u scripts/test_m5_runtime.py
+      - name: Bounded container diagnostics on failure
         if: failure()
         run: |
           cd upstream/LibreChat
           docker compose ps || true
-          echo "Inspect application logs locally; CI intentionally does not dump potentially sensitive logs."
+          # Print matching error *categories* only; never publish raw app logs,
+          # .env contents, API keys, user messages or auth tokens.
+          python3 - <<'PY'
+          import subprocess
+          for service in ("mongodb", "meilisearch", "api"):
+              p = subprocess.run(["docker", "compose", "logs", "--no-color", "--tail", "120", service], capture_output=True, text=True)
+              output = (p.stdout + p.stderr).lower()
+              markers = {"permissions":"permission denied" in output or "operation not permitted" in output,
+                         "readiness":"not ready" in output, "fatal":"fatal" in output or "failed to start" in output}
+              print(service, markers, "log_available=", p.returncode == 0)
+          PY
       - name: Destroy temporary data and services
         if: always()
         run: |
