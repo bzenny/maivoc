@@ -21,6 +21,13 @@ cp "$DEST/.env.example" "$DEST/.env"
 cp "$ROOT/config/librechat.yaml" "$DEST/librechat.yaml"
 cp "$ROOT/config/docker-compose.override.yml" "$DEST/docker-compose.override.yml"
 
+# Docker bind mounts must exist with the host UID/GID before Compose starts.
+# Otherwise Docker creates root-owned directories; MongoDB and Meilisearch
+# run as the caller UID/GID and may enter a permission-denied restart loop.
+umask 077
+mkdir -p "$DEST/data-node" "$DEST/meili_data_v1.35.1" \
+         "$DEST/images" "$DEST/uploads" "$DEST/logs" "$DEST/skill"
+
 python3 - "$DEST/.env" "$(id -u)" "$(id -g)" <<'PYENV'
 import pathlib, re, secrets, sys
 p=pathlib.Path(sys.argv[1])
