@@ -123,8 +123,8 @@ def disable_registration() -> None:
 # about what a scheduler error might say. Regressions are tested by a live
 # scheduler-disabled CI boot plus an isolated log parser test.
 STARTUP_FAILURE_PATTERNS = {
-    "scheduler not started": r"\\[schedules\\][^\\n]*scheduler\\s+NOT\\s+started",
-    "scheduler permanently unavailable": r"PERMANENTLY\\s+unavailable",
+    "scheduler not started": r"\[schedules\][^\n]*scheduler\s+NOT\s+started",
+    "scheduler permanently unavailable": r"PERMANENTLY\s+unavailable",
     "initialization failed": r"Post-listen initialization failed",
     "server failed to start": r"Failed to start server:",
     "startup config error": r"Error in startup config",
@@ -136,7 +136,7 @@ STARTUP_FAILURE_PATTERNS = {
 # proven-benign message only with documentation and a regression fixture.
 ALLOWED_ERROR_LEVEL_LOGS: tuple[str, ...] = ()
 ERROR_LEVEL_RE = re.compile(
-    r"(?:^|[\\s|])(?:ERROR|FATAL)(?=[:\\s\\]])",
+    r"(?:^|[\s|])(?:ERROR|FATAL)(?=[:\s\]])",
     flags=re.IGNORECASE,
 )
 
