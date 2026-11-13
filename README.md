@@ -21,7 +21,7 @@ Brand files live in `assets/branding/`. The transparent PNG master and opaque mo
 Prerequisites: Git, Python 3, Docker Engine with the Compose **v2.24.4+** plugin, and a Docker-capable Linux user.
 
 ```bash
-git clone --branch feat/m4-branding https://github.com/bzenny/maivoc.git
+git clone https://github.com/bzenny/maivoc.git
 cd maivoc
 bash scripts/bootstrap.sh
 cd upstream/LibreChat
