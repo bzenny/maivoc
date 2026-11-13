@@ -18,7 +18,7 @@ Brand files live in `assets/branding/`. Use the [light lockup](assets/branding/m
 
 ## Automated runtime verification (M5)
 
-GitHub Actions runs `scripts/test_m5_runtime.py` against a **fresh, real pinned LibreChat image** (not only the Maivoc static config). It checks HTTP readiness, byte-for-byte PWA asset overlays, one-time signup/login, ordered provider names and trust labels, blocked registrations after disabling signup, owner re-login, and startup failure signatures. No cloud model calls are made or user keys required. Logs and credentials are not uploaded to CI artifacts.
+GitHub Actions runs `scripts/test_m5_runtime.py` against a **fresh, real pinned LibreChat image** (not only the Maivoc static config). It checks HTTP readiness, byte-for-byte PWA asset overlays, one-time signup/login, ordered provider names and trust labels, blocked registrations after disabling signup, owner re-login, and startup failure signatures. It also intentionally boots a scheduler-disabled instance to prove the log guard rejects `[schedules] scheduler NOT started` / `PERMANENTLY unavailable`, and verifies owner login survives a full database/application stop-start. No cloud model calls are made or user keys required. Logs and credentials are not uploaded to CI artifacts.
 
 To run the same test on an empty disposable instance (this registers and locks its throwaway test account):
 

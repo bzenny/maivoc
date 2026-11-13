@@ -34,7 +34,8 @@ Static checks do not count as application or security testing; record dates and 
 - [x] Test account registers; login token and ordered `/api/endpoints` work
 - [x] Free-first provider names and trust labels match integration contract
 - [x] Registration off returns 403 while pre-existing account can login
-- [x] No known scheduler/initialization failure signature in startup logs
+- [ ] Scheduler/initialization failure detection: real scheduler-disabled CI must fail the log guard (Review #5)
+- [ ] Full API, MongoDB and search-service stop/start retains owner authentication and registration lock
 **Not covered by CI:** real provider responses, local Qwen pull, mid-thread switching, side-by-side compare, history search/persistence, phone installation, production hosting, backups and restore.
 
 
@@ -58,3 +59,9 @@ Static checks do not count as application or security testing; record dates and 
 7. Verify distribution compliance and approve a versioned release/tag; do not claim GitHub Actions is a deployment pipeline.
 
 **Post-MVP:** managed multi-user architecture and tenant isolation (#10).
+
+### Review #5 regression requirements
+- The real v0.8.8 scheduler failure produces `[schedules] scheduler NOT started` and/or `PERMANENTLY unavailable`. Generic guessed patterns are inadequate.
+- CI must deliberately remove `SCHEDULES_SINGLE_PROCESS` during disposable bootstrap and prove `check_logs()` rejects that actually broken run.
+- CI must also cold-stop/restart API, MongoDB and Meilisearch, then verify account persistence, owner login and registration lock.
+- Actions run on `ubuntu-24.04` with Node-24-based `actions/checkout@v7.0.1` and `actions/setup-python@v7.1.0`.
