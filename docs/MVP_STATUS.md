@@ -51,3 +51,5 @@ The original M5 test passed despite LibreChat's `[schedules] scheduler NOT start
 
 ## Search and provider remediation (search API verified; live provider calls pending)
 New installs explicitly enable LibreChat full-text search with Meilisearch telemetry disabled and a unique master key. Runtime CI writes a real message through LibreChat and searches it before and after a cold restart. Gemini's new bootstrap default is `gemini-3.5-flash-lite` (officially documented free-tier model), with actual live account response tests pending. Existing installations are not overwritten by `git pull`; follow README instructions and preserve existing secrets.
+
+**Search verification:** [M5 CI 43372373885](https://github.com/bzenny/maivoc/actions/runs/43372373885) confirms message import, authenticated normal-message save, full-text search, full service restart and identical search result afterward; model catalog also exposes OpenRouter, Groq and Gemini 3.5 Flash-Lite. **No external provider keys or inference calls occurred in CI.**
