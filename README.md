@@ -12,7 +12,7 @@ The canonical icon is the **connected-M** (violet→mint M wings with three whit
 
 ![Maivoc connected-M icon](assets/branding/maivoc-mark.svg)
 
-Brand files live in `assets/branding/`. The transparent PNG master and opaque mobile/PWA icons are generated from SVG and committed by GitHub Actions. This repo's Compose overlay mounts the Maivoc web manifest and branded images onto the pinned official LibreChat application. Test an actual phone installation before calling PWA readiness complete.
+Brand files live in `assets/branding/`. Use the [light lockup](assets/branding/maivoc-lockup.png) on bright backgrounds and the [reversed lockup](assets/branding/maivoc-lockup-reversed.png) on dark backgrounds. Both have a font-independent outlined Inter wordmark. The transparent PNG master and opaque mobile/PWA icons are generated from SVG and committed by GitHub Actions. This repo's Compose overlay mounts the Maivoc web manifest and branded images onto the pinned official LibreChat application. Test an actual phone installation before calling PWA readiness complete.
 
 **Provider trust:** `Local · Private` (Ollama on your hardware); `Free · Limits apply` (rate-limited cloud free tiers); `Paid · Billed to your key` (optional APIs). The custom endpoint labels are set in YAML; not all built-in provider picker subtitles can be changed through configuration. See the guide.
 

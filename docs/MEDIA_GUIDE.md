@@ -1,13 +1,14 @@
 # Maivoc media usage, deployment and provenance
 
 ## Canonical source-of-truth
-`assets/branding/maivoc-mark.svg` and `assets/branding/maivoc-lockup.svg` are the editable vector master files. The mark has a **truly transparent SVG canvas**. Never start from a screenshot/marketing board or an automatically generated portal/lock image.
+`assets/branding/maivoc-mark.svg`, `assets/branding/maivoc-lockup.svg` and `assets/branding/maivoc-lockup-reversed.svg` are the editable vector master files. The light lockup uses a charcoal outlined Inter Bold wordmark; the reversed lockup uses the same outlines in white. The mark has a **truly transparent SVG canvas**. Never start from a screenshot/marketing board or an automatically generated portal/lock image.
 
 ## Generated assets (committed in M4)
 | Repository file | Alpha / background | Purpose |
 |---|---|---|
 | `assets/branding/maivoc-mark.png` | Transparent, 1024² | Logo/icon master, press and splash materials |
-| `assets/branding/maivoc-lockup.png` | Transparent, 1800×440 | Wordmark + connected-M |
+| `assets/branding/maivoc-lockup.png` | Transparent, 1800×440 | Dark wordmark, **light surfaces only** |
+| `assets/branding/maivoc-lockup-reversed.png` | Transparent, 1800×440 | White wordmark, **dark surfaces only** |
 | `assets/branding/pwa/favicon-16x16.png` | Transparent | Browser favicon |
 | `assets/branding/pwa/favicon-32x32.png` | Transparent | Browser favicon |
 | `assets/branding/pwa/apple-touch-icon-180x180.png` | Opaque charcoal | iOS home screen |
@@ -22,7 +23,7 @@ python3 -m pip install Pillow==11.3.0 CairoSVG==2.8.2
 python3 scripts/build_brand_assets.py
 python3 scripts/verify_brand_assets.py
 ```
-Assets on `feat/m4-branding` are generated and committed by `.github/workflows/brand-assets.yml` when vector masters change. The production app should consume the committed PNGs; end users do **not** need Python imaging dependencies.
+On `feat/*` and `fix/*` branches, `.github/workflows/brand-assets.yml` regenerates and commits PNG binaries when vector masters change. It **refuses** to run the commit job on `main`, including manual dispatch. Review generated binary changes in a pull request before merge. The production app should consume the committed PNGs; end users do **not** need Python imaging dependencies.
 
 ## Runtime mounting: official LibreChat image, not a fork
 LibreChat v0.8.8's `client/vite.config.ts` generates `client/dist/manifest.webmanifest` at build-time. The pinned Docker image serves the built assets from `/app/client/dist`. The Maivoc Compose override bind-mounts the custom manifest and icon filenames on those existing paths; `scripts/bootstrap.sh` copies the override into the Git-ignored upstream runtime.
